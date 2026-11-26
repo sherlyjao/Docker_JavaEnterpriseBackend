@@ -1,0 +1,51 @@
+services:
+  # 1. Oracle Database Service
+  oracle_db:
+    image: gvenzl/oracle-free:latest
+    container_name: oracle_container
+    environment:
+      - ORACLE_PASSWORD=sherly
+      - APP_USER=oracle_user
+      - APP_USER_PASSWORD=sherly
+    ports:
+      - "1522:1521" 
+    volumes:
+      - oradata:/opt/oracle/oradata
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+
+  # 2. Spring Boot Service
+  backend_app:
+    build: ./spring_mvc  # Points to the folder containing your backend Dockerfile
+    container_name: spring_backend
+    ports:
+      - "8080:8080"   # Exposes your REST APIs to your desktop browser/Postman
+    environment:
+      - DB_HOST=oracle_container  # Uses the database service name as the hostname
+      - DB_PORT=1521
+      - DB_SERVICE=FREEPDB1
+      - DB_USER=oracle_user
+      - DB_PASS=sherly
+    depends_on:
+      # Waits for the DB container to start before running Spring Boot
+      oracle_db:
+        condition: service_healthy
+        
+# volumes:
+#   oradata:  # Ensures your data isn't deleted when the container stops
+
+  # 3. JavaScript Service
+  frontend_app:
+    build: ./integrated_student_management_system
+    container_name: web_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend_app
+
+volumes:
+  oradata:  # Ensures your data isn't deleted when the container stops
