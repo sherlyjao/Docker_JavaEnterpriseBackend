@@ -1,0 +1,19 @@
+package com.spring.spring_rest_security.service;
+
+import java.util.List;
+
+import com.spring.spring_rest_security.dto.StudentDto;
+
+/**
+ * Interface StudentService defining business operations.
+ * Manages {@link StudentDto} records.
+ */
+public interface StudentService {
+
+    StudentDto createStudent(StudentDto theStudentDto);
+    StudentDto getStudentById(Long theId);
+    List<StudentDto> getAllStudents();
+    StudentDto updateStudent(Long theId, StudentDto theStudentDto);
+    StudentDto patchStudent(Long theId, StudentDto theStudentDto);
+    void deleteStudentById(Long theId);
+}
